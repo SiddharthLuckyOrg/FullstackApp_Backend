@@ -1,0 +1,23 @@
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import javax.net.ssl.SSLException;
+
+public class WebClientConfig {
+
+    public static WebClient createInsecureWebClient() throws SSLException {
+        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient()
+                .trustManager(InsecureTrustManagerFactory.INSTANCE);
+
+        HttpClient httpClient = HttpClient.create()
+                .secure(t -> t.sslContext(sslContextBuilder));
+
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+
+}
